@@ -4,7 +4,7 @@
   "description": "Admin panel for clothing store",
   "main": "app.js",
   "scripts": {
-    "start": "cross-env NODE_OPTIONS=--no-deprecation node app.js",
+    "start": "cross-env NODE_OPTIONS=--no-deprecation nodemon app.js",
     "dev": "nodemon app.js",
     "build": "npm install",
     "vercel-build": "echo hello",

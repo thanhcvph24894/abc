@@ -12,11 +12,11 @@ class DashboardController {
         req.flash("error", "Bạn không có quyền truy cập trang này");
         return res.redirect("/");
       }
-
+      
       // Lấy thời gian đầu và cuối tháng hiện tại
       const startOfMonth = moment().startOf("month").toDate();
       const endOfMonth = moment().endOf("month").toDate();
-
+      
       // Thống kê cơ bản
       const stats = {
         categoryCount: await Category.countDocuments({ isActive: true }),
@@ -33,13 +33,17 @@ class DashboardController {
           paymentStatus: "Đã thanh toán",
         }),
       };
-
-      // Tính tổng doanh thu từ đơn hàng đã hoàn thành
+      
+      // Tính tổng doanh thu từ đơn hàng đã hoàn thành trong tháng hiện tại
       const revenueStats = await Order.aggregate([
         {
           $match: {
             orderStatus: "Đã giao hàng",
             paymentStatus: "Đã thanh toán",
+            createdAt: {
+              $gte: startOfMonth,
+              $lte: endOfMonth,
+            },
           },
         },
         {
@@ -49,16 +53,17 @@ class DashboardController {
           },
         },
       ]);
-      stats.totalRevenue =
-        revenueStats.length > 0 ? revenueStats[0].totalRevenue : 0;
-
-      // Lấy 5 đơn hàng mới nhất
+      stats.totalRevenue = revenueStats.length > 0 ? revenueStats[0].totalRevenue : 0;
+      
+      // Lấy 5 đơn hàng mới nhất với trạng thái chi tiết hơn
       const recentOrders = await Order.find()
-        .populate("user", "name")
+        .populate("user", "name email")
         .sort({ createdAt: -1 })
         .limit(5);
-
-      // Lấy top 5 sản phẩm bán chạy trong tháng
+      
+      // Các trạng thái đơn hàng đã được cập nhật chi tiết hơn trong template
+      
+      // Top sản phẩm bán chạy trong tháng hiện tại
       const topProducts = await Order.aggregate([
         {
           $match: {
@@ -74,7 +79,6 @@ class DashboardController {
         {
           $group: {
             _id: "$items.product",
-            name: { $first: "$items.name" },
             totalQuantity: { $sum: "$items.quantity" },
             totalRevenue: {
               $sum: { $multiply: ["$items.price", "$items.quantity"] },
@@ -83,10 +87,30 @@ class DashboardController {
         },
         { $sort: { totalQuantity: -1 } },
         { $limit: 5 },
+        {
+          $lookup: {
+            from: "products",
+            localField: "_id",
+            foreignField: "_id",
+            as: "productInfo",
+          },
+        },
+        { $unwind: { path: "$productInfo", preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            _id: 1,
+            name: { $ifNull: ["$productInfo.name", "Sản phẩm không xác định"] },
+            image: {
+              $ifNull: [{ $arrayElemAt: ["$productInfo.images", 0] }, null],
+            },
+            totalQuantity: 1,
+            totalRevenue: 1,
+          },
+        },
       ]);
-
+      
       res.render("pages/dashboard", {
-        title: "Tổng quan",
+        title: "Bảng điều khiển",
         stats,
         recentOrders,
         topProducts,

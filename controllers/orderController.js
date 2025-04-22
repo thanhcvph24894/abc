@@ -116,7 +116,7 @@ class OrderController {
             const validStatusFlow = {
                 'Chờ xác nhận': ['Đã xác nhận', 'Đã hủy'],
                 'Đã xác nhận': ['Đang giao hàng', 'Đã hủy'],
-                'Đang giao hàng': ['Đã giao hàng', 'Đã hủy']
+                'Đang giao hàng': ['Đã giao hàng']
             };
 
             if (!validStatusFlow[order.orderStatus]?.includes(orderStatus)) {
@@ -132,7 +132,7 @@ class OrderController {
             // Xử lý các logic phụ thuộc
             if (orderStatus === 'Đã giao hàng') {
                 // Nếu là COD và giao hàng thành công, tự động cập nhật thanh toán
-                if (order.paymentMethod === 'COD' && order.paymentStatus === 'Chưa thanh toán') {
+                if (order.paymentStatus === 'Chưa thanh toán') {
                     order.paymentStatus = 'Đã thanh toán';
                 }
             } else if (orderStatus === 'Đã hủy') {

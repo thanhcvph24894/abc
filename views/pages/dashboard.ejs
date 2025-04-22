@@ -1,28 +1,30 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0">Tổng quan</h1>
+    <h1 class="h3 mb-0">Bảng điều khiển</h1>
     <div>
-        <button class="btn btn-outline-secondary" onclick="window.print()">
+        <button class="btn btn-primary" onclick="window.print()">
             <i class="fas fa-print me-2"></i>In báo cáo
         </button>
     </div>
 </div>
 
-<div class="container-fluid">
-    <!-- Thống kê tổng quan -->
+<div class="container-fluid p-0">
     <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100">
+            <div class="card stat-card border-0 shadow h-100">
                 <div class="card-body">
                     <div class="row align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Doanh thu tháng</div>
-                            <div class="h5 mb-0 font-weight-bold">
-                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(stats.totalRevenue) %>
+                        <div class="col-auto">
+                            <div class="stat-icon bg-primary">
+                                <i class="fas fa-dollar-sign"></i>
                             </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        <div class="col">
+                            <div class="text-xs text-muted text-uppercase mb-1">
+                                Doanh thu tháng</div>
+                            <div class="h4 mb-0 font-weight-bold">
+                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                    }).format(stats.totalRevenue) %>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -30,57 +32,140 @@
         </div>
 
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100">
+            <div class="card stat-card border-0 shadow h-100">
                 <div class="card-body">
                     <div class="row align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                        <div class="col-auto">
+                            <div class="stat-icon bg-success">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="text-xs text-muted text-uppercase mb-1">
                                 Đơn hàng</div>
-                            <div class="h5 mb-0 font-weight-bold">
+                            <div class="h4 mb-0 font-weight-bold">
                                 <%= stats.orderCount %>
                             </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100">
+            <div class="card stat-card border-0 shadow h-100">
                 <div class="card-body">
                     <div class="row align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                        <div class="col-auto">
+                            <div class="stat-icon bg-info">
+                                <i class="fas fa-list"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="text-xs text-muted text-uppercase mb-1">
                                 Danh mục</div>
-                            <div class="h5 mb-0 font-weight-bold">
+                            <div class="h4 mb-0 font-weight-bold">
                                 <%= stats.categoryCount %>
                             </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-list fa-2x text-gray-300"></i>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100">
+            <div class="card stat-card border-0 shadow h-100">
                 <div class="card-body">
                     <div class="row align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                        <div class="col-auto">
+                            <div class="stat-icon bg-warning">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="text-xs text-muted text-uppercase mb-1">
                                 Người dùng</div>
-                            <div class="h5 mb-0 font-weight-bold">
+                            <div class="h4 mb-0 font-weight-bold">
                                 <%= stats.userCount %>
                             </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Stats Summary -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Tình trạng đơn hàng</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Đơn mới (<%= stats.newOrdersCount %>)</span>
+                        <div class="progress flex-grow-1 mx-3" style="height: 8px;">
+                            <div class="progress-bar bg-warning"
+                                style="width: <%= Math.round(stats.newOrdersCount / stats.orderCount * 100) %>%"></div>
                         </div>
+                        <span class="text-muted">
+                            <%= Math.round(stats.newOrdersCount / stats.orderCount * 100) %>%
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Đã hoàn thành (<%= stats.completedOrdersCount %>)</span>
+                        <div class="progress flex-grow-1 mx-3" style="height: 8px;">
+                            <div class="progress-bar bg-success"
+                                style="width: <%= Math.round(stats.completedOrdersCount / stats.orderCount * 100) %>%">
+                            </div>
+                        </div>
+                        <span class="text-muted">
+                            <%= Math.round(stats.completedOrdersCount / stats.orderCount * 100) %>%
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Đang xử lý (<%= stats.orderCount - stats.completedOrdersCount - stats.newOrdersCount %>
+                                )</span>
+                        <div class="progress flex-grow-1 mx-3" style="height: 8px;">
+                            <div class="progress-bar bg-info"
+                                style="width: <%= Math.round((stats.orderCount - stats.completedOrdersCount - stats.newOrdersCount) / stats.orderCount * 100) %>%">
+                            </div>
+                        </div>
+                        <span class="text-muted">
+                            <%= Math.round((stats.orderCount - stats.completedOrdersCount - stats.newOrdersCount) /
+                                stats.orderCount * 100) %>%
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thống kê sản phẩm</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Sản phẩm đang bán (<%= stats.activeProductCount %>)</span>
+                        <div class="progress flex-grow-1 mx-3" style="height: 8px;">
+                            <div class="progress-bar bg-success"
+                                style="width: <%= Math.round(stats.activeProductCount / stats.productCount * 100) %>%">
+                            </div>
+                        </div>
+                        <span class="text-muted">
+                            <%= Math.round(stats.activeProductCount / stats.productCount * 100) %>%
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Người dùng hoạt động (<%= stats.activeUserCount %>)</span>
+                        <div class="progress flex-grow-1 mx-3" style="height: 8px;">
+                            <div class="progress-bar bg-primary"
+                                style="width: <%= Math.round(stats.activeUserCount / stats.userCount * 100) %>%"></div>
+                        </div>
+                        <span class="text-muted">
+                            <%= Math.round(stats.activeUserCount / stats.userCount * 100) %>%
+                        </span>
                     </div>
                 </div>
             </div>
@@ -88,19 +173,18 @@
     </div>
 
     <div class="row">
-        <!-- Đơn hàng mới nhất -->
         <div class="col-xl-6 col-lg-6">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <div class="card border-0 shadow mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Đơn hàng mới nhất</h6>
                     <a href="/orders" class="btn btn-sm btn-primary">
-                        <i class="fas fa-arrow-right"></i>
+                        Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
                     </a>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Mã đơn</th>
                                     <th>Khách hàng</th>
@@ -109,24 +193,50 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% if (recentOrders.length > 0) { %>
-                                    <% recentOrders.forEach(order => { %>
+                                <% if (recentOrders.length> 0) { %>
+                                    <% recentOrders.forEach(order=> { %>
                                         <tr>
-                                            <td><%= order._id %></td>
-                                            <td><%= order.user ? order.user.name : 'N/A' %></td>
-                                            <td><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalAmount) %></td>
-                                            <td>
-                                                <span class="badge status-<%= order.orderStatus.toLowerCase().replace(/\s+/g, '-') %>">
-                                                    <%= order.orderStatus %>
-                                                </span>
+                                            <td class="align-middle">
+                                                <a href="/orders/<%= order._id %>" class="fw-medium text-primary">
+                                                    #<%= order.orderNumber %>
+                                                </a>
+                                            </td>
+                                            <td class="align-middle">
+                                                <%= order.user ? order.user.name : 'Khách vãng lai' %>
+                                            </td>
+                                            <td class="align-middle">
+                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                                    }).format(order.totalAmount) %>
+                                            </td>
+                                            <td class="align-middle">
+                                                <% let statusClass='' ; let statusIcon='' ; switch(order.orderStatus) {
+                                                    case 'Chờ xác nhận' : statusClass='bg-warning-subtle text-warning' ;
+                                                    statusIcon='clock' ; break; case 'Đã xác nhận' :
+                                                    statusClass='bg-info-subtle text-info' ; statusIcon='check-circle' ;
+                                                    break; case 'Đang chuẩn bị hàng' :
+                                                    statusClass='bg-primary-subtle text-primary' ; statusIcon='box' ;
+                                                    break; case 'Đang giao hàng' :
+                                                    statusClass='bg-info-subtle text-info' ; statusIcon='truck' ; break;
+                                                    case 'Đã giao hàng' : statusClass='bg-success-subtle text-success' ;
+                                                    statusIcon='check-double' ; break; case 'Đã hủy' :
+                                                    statusClass='bg-danger-subtle text-danger' ; statusIcon='x-circle' ;
+                                                    break; case 'Hoàn trả' :
+                                                    statusClass='bg-secondary-subtle text-secondary' ;
+                                                    statusIcon='arrow-left-circle' ; break; default:
+                                                    statusClass='bg-secondary-subtle text-secondary' ;
+                                                    statusIcon='circle' ; } %>
+                                                    <div class="status-badge <%= statusClass %>">
+                                                        <i class="fas fa-<%= statusIcon %> me-1"></i>
+                                                        <%= order.orderStatus %>
+                                                    </div>
                                             </td>
                                         </tr>
-                                    <% }) %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="4" class="text-center">Chưa có đơn hàng nào</td>
-                                    </tr>
-                                <% } %>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <tr>
+                                                    <td colspan="4" class="text-center py-4">Chưa có đơn hàng nào</td>
+                                                </tr>
+                                                <% } %>
                             </tbody>
                         </table>
                     </div>
@@ -134,41 +244,55 @@
             </div>
         </div>
 
-        <!-- Top sản phẩm bán chạy -->
         <div class="col-xl-6 col-lg-6">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <div class="card border-0 shadow mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-success">Top sản phẩm bán chạy</h6>
                     <a href="/reports" class="btn btn-sm btn-success">
-                        <i class="fas fa-arrow-right"></i>
+                        Xem báo cáo <i class="fas fa-arrow-right ms-1"></i>
                     </a>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>Sản phẩm</th>
-                                    <th>Số lượng</th>
-                                    <th>Doanh thu</th>
+                                    <th style="width: 55%">Sản phẩm</th>
+                                    <th style="width: 15%" class="text-center">Số lượng</th>
+                                    <th style="width: 30%" class="text-end">Doanh thu</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <% if (topProducts && topProducts.length > 0) { %>
-                                    <% topProducts.forEach(product => { %>
+                                <% if (topProducts && topProducts.length> 0) { %>
+                                    <% topProducts.forEach(product=> { %>
                                         <tr>
-                                            <td><%= product.name %></td>
-                                            <td class="text-center"><%= product.totalQuantity %></td>
-                                            <td class="text-end">
-                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.totalRevenue) %>
+                                            <td class="align-middle">
+                                                <div class="d-flex align-items-center">
+                                                    <% if (product.image) { %>
+                                                        <div class="product-thumbnail me-3">
+                                                            <img src="<%= product.image %>" alt="<%= product.name %>"
+                                                                class="img-fluid" width="40">
+                                                        </div>
+                                                        <% } %>
+                                                            <span class="fw-medium">
+                                                                <%= product.name %>
+                                                            </span>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle text-center fw-medium">
+                                                <%= product.totalQuantity %>
+                                            </td>
+                                            <td class="align-middle text-end fw-medium">
+                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                                    }).format(product.totalRevenue) %>
                                             </td>
                                         </tr>
-                                    <% }) %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="3" class="text-center">Chưa có dữ liệu</td>
-                                    </tr>
-                                <% } %>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <tr>
+                                                    <td colspan="3" class="text-center py-4">Chưa có dữ liệu</td>
+                                                </tr>
+                                                <% } %>
                             </tbody>
                         </table>
                     </div>
@@ -179,36 +303,188 @@
 </div>
 
 <style>
-.border-left-primary { border-left: .25rem solid #4e73df!important; }
-.border-left-success { border-left: .25rem solid #1cc88a!important; }
-.border-left-info { border-left: .25rem solid #36b9cc!important; }
-.border-left-warning { border-left: .25rem solid #f6c23e!important; }
-.text-gray-300 { color: #dddfeb!important; }
-
-.status-cho-xac-nhan { background-color: #ffc107; color: #000; }
-.status-da-xac-nhan { background-color: #17a2b8; color: #fff; }
-.status-dang-giao-hang { background-color: #007bff; color: #fff; }
-.status-da-giao-hang { background-color: #28a745; color: #fff; }
-.status-da-huy { background-color: #dc3545; color: #fff; }
-
-.badge {
-    padding: 0.5em 0.75em;
-    border-radius: 0.25rem;
-    font-weight: 500;
-    font-size: 85%;
-}
-
-.card {
-    margin-bottom: 1.5rem;
-}
-
-.table td, .table th {
-    vertical-align: middle;
-}
-
-@media print {
-    .btn {
-        display: none !important;
+    body {
+        background-color: #f8f9fc;
     }
-}
-</style> 
+
+    .card {
+        border-radius: 0.75rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .card-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        border-top-left-radius: 0.75rem !important;
+        border-top-right-radius: 0.75rem !important;
+    }
+
+    .stat-card {
+        overflow: hidden;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        color: white;
+        font-size: 1.25rem;
+    }
+
+    .bg-primary {
+        background-color: #4e73df !important;
+    }
+
+    .bg-success {
+        background-color: #1cc88a !important;
+    }
+
+    .bg-info {
+        background-color: #36b9cc !important;
+    }
+
+    .bg-warning {
+        background-color: #f6c23e !important;
+    }
+
+    .bg-danger {
+        background-color: #e74a3b !important;
+    }
+
+    .text-primary {
+        color: #4e73df !important;
+    }
+
+    .text-success {
+        color: #1cc88a !important;
+    }
+
+    .text-info {
+        color: #36b9cc !important;
+    }
+
+    .text-warning {
+        color: #f6c23e !important;
+    }
+
+    .text-danger {
+        color: #e74a3b !important;
+    }
+
+    /* Status badges */
+    .status-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 50rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
+    }
+
+    .bg-primary-subtle {
+        background-color: rgba(78, 115, 223, 0.15);
+    }
+
+    .bg-success-subtle {
+        background-color: rgba(28, 200, 138, 0.15);
+    }
+
+    .bg-info-subtle {
+        background-color: rgba(54, 185, 204, 0.15);
+    }
+
+    .bg-warning-subtle {
+        background-color: rgba(246, 194, 62, 0.15);
+    }
+
+    .bg-danger-subtle {
+        background-color: rgba(231, 74, 59, 0.15);
+    }
+
+    .bg-secondary-subtle {
+        background-color: rgba(108, 117, 125, 0.15);
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table td {
+        vertical-align: middle;
+        padding: 0.75rem 1rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .product-thumbnail {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 6px;
+        overflow: hidden;
+        background-color: #f8f9fa;
+    }
+
+    .progress {
+        background-color: #eaecf4;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        border-radius: 10px;
+    }
+
+    @media print {
+        body {
+            background-color: white !important;
+        }
+
+        .btn,
+        .card-header a {
+            display: none !important;
+        }
+
+        .card {
+            box-shadow: none !important;
+            border: 1px solid #dee2e6 !important;
+            break-inside: avoid;
+        }
+
+        .container-fluid {
+            width: 100% !important;
+            padding: 0 !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .h4 {
+            font-size: 1.25rem;
+        }
+
+        .h6 {
+            font-size: 0.9rem;
+        }
+    }
+</style>
