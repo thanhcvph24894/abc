@@ -1,0 +1,197 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Quản lý danh mục</h1>
+        <a href="/categories/create" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Thêm danh mục
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover datatable">
+                    <thead>
+                        <tr>
+                            <th width="5%">STT</th>
+                            <th>Tên</th>
+                            <th>Slug</th>
+                            <th>Mô tả</th>
+                            <th>Hình ảnh</th>
+                            <th width="10%">Trạng thái</th>
+                            <th width="10%">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% categories.forEach((category, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td>
+                                <td><%= category.name %></td>
+                                <td><%= category.slug %></td>
+                                <td>
+                                    <% if (category.description) { %>
+                                        <%= category.description.length > 50 ? 
+                                            category.description.substring(0, 50) + '...' : 
+                                            category.description %>
+                                    <% } else { %>
+                                        <em class="text-muted">Không có mô tả</em>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (category.image) { %>
+                                        <img src="<%= category.image %>" alt="<%= category.name %>" 
+                                             style="max-width: 50px; max-height: 50px;">
+                                    <% } else { %>
+                                        <span class="badge bg-secondary">Không có ảnh</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="form-check form-switch me-2">
+                                            <input class="form-check-input toggle-status" 
+                                                   type="checkbox"
+                                                   <%= category.isActive ? 'checked' : '' %>
+                                                   data-url="/categories/<%= category._id %>/status"
+                                                   data-id="status-badge-<%= category._id %>">
+                                        </div>
+                                        <span class="badge status-badge" id="status-badge-<%= category._id %>" 
+                                              data-active="<%= category.isActive %>">
+                                            <%= category.isActive ? 'Hoạt động' : 'Ẩn' %>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="/categories/edit/<%= category._id %>" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-danger delete-item"
+                                                data-url="/categories/<%= category._id %>"
+                                                data-name="<%= category.name %>"
+                                                data-type="category">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                        <% if (categories.length === 0) { %>
+                        <tr>
+                            <td colspan="7" class="text-center">Không có danh mục nào</td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.status-badge {
+    min-width: 80px;
+    text-align: center;
+}
+.status-badge[data-active="true"] {
+    background-color: #198754;
+}
+.status-badge[data-active="false"] {
+    background-color: #dc3545;
+}
+</style>
+
+<%- contentFor('script') %>
+<script>
+$(document).ready(function() {
+    // Khởi tạo DataTable
+    const table = $('#categoriesTable').DataTable({
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json'
+        },
+        order: [[0, 'asc']],
+        pageLength: 10,
+        responsive: true
+    });
+
+    // Xử lý cập nhật trạng thái
+    $('.status-toggle').on('change', function() {
+        const id = $(this).data('id');
+        const isActive = this.checked;
+        const badge = $(this).siblings('label').find('.badge');
+
+        if (!confirm('Bạn có chắc chắn muốn thay đổi trạng thái danh mục này?')) {
+            // Nếu người dùng không xác nhận, reset về trạng thái cũ
+            this.checked = !isActive;
+            return;
+        }
+
+        $.ajax({
+            url: `/categories/${id}/status`,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ isActive: isActive }),
+            success: function(response) {
+                if (response.success) {
+                    // Cập nhật badge
+                    badge.removeClass('bg-success bg-danger')
+                         .addClass(isActive ? 'bg-success' : 'bg-danger')
+                         .text(isActive ? 'Hoạt động' : 'Ẩn');
+                    
+                    // Hiển thị thông báo
+                    alert('Cập nhật trạng thái thành công');
+                } else {
+                    alert('Có lỗi xảy ra: ' + response.message);
+                    // Reset về trạng thái cũ
+                    this.checked = !isActive;
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Có lỗi xảy ra khi cập nhật trạng thái');
+                // Reset về trạng thái cũ
+                this.checked = !isActive;
+            }
+        });
+    });
+
+    // Xử lý xóa danh mục
+    $('.delete-item').on('click', function() {
+        const url = $(this).data('url');
+        const name = $(this).data('name');
+
+        if (confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
+            $.ajax({
+                url: url,
+                method: 'DELETE',
+                success: function(response) {
+                    if (response.success) {
+                        // Xóa dòng khỏi bảng
+                        table.row(row).remove().draw();
+                        // Hiển thị thông báo thành công
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công!',
+                            text: 'Xóa danh mục ' + name + ' thành công',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: response.message || 'Có lỗi xảy ra khi xóa danh mục'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    const response = xhr.responseJSON;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: response?.message || 'Có lỗi xảy ra khi xóa danh mục'
+                    });
+                }
+            });
+        }
+    });
+});
+</script> 

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Shop Admin' %></title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- DataTables -->
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- Bootstrap Tags Input -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/admin.css" rel="stylesheet">
+    <%- style %>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="bg-dark">
+            <div class="sidebar-header">
+                <h3 class="text-white text-center">Shop Admin</h3>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li class="<%= isActive('/') %>">
+                    <a href="/">
+                        <i class="fas fa-tachometer-alt"></i> Tổng quan
+                    </a>
+                </li>
+                <li class="<%= isActive('/categories') %>">
+                    <a href="/categories">
+                        <i class="fas fa-tags"></i> Danh mục
+                    </a>
+                </li>
+                <li class="<%= isActive('/products') %>">
+                    <a href="/products">
+                        <i class="fas fa-tshirt"></i> Sản phẩm
+                    </a>
+                </li>
+                <li class="<%= isActive('/orders') %>">
+                    <a href="/orders">
+                        <i class="fas fa-shopping-cart"></i> Đơn hàng
+                    </a>
+                </li>
+                <li class="<%= isActive('/users') %>">
+                    <a href="/users">
+                        <i class="fas fa-users"></i> Khách hàng
+                    </a>
+                </li>
+                <li class="<%= isActive('/reports') %>">
+                    <a href="/reports">
+                        <i class="fas fa-chart-bar"></i> Báo cáo
+                    </a>
+                </li>
+                <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-dark">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <div class="ms-auto d-flex align-items-center">
+                        <div class="me-3">
+                            <span class="text-muted">Xin chào,</span>
+                            <span class="fw-bold"><%= user ? user.name : 'Admin' %></span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Flash Messages -->
+            <% if (messages.success) { %>
+                <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+                    <i class="fas fa-check-circle me-2"></i><%= messages.success %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+
+            <% if (messages.error) { %>
+                <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i><%= messages.error %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+
+            <!-- Main Content -->
+            <main class="p-4">
+                <%- body %>
+            </main>
+
+            <!-- Footer -->
+            <footer class="footer mt-auto py-3 bg-light">
+                <div class="container-fluid text-center">
+                    <span class="text-muted">© <%= new Date().getFullYear() %> Shop Admin. All rights reserved.</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Custom JS -->
+    <script src="/js/admin.js"></script>
+    <%- script %>
+</body>
+</html> 

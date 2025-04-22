@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/app.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "5000",
+    "MONGODB_URI": "mongodb+srv://huongchaytool5:oYS5JBVYHz43gUD4@cluster0.yrnue.mongodb.net/shopquanao?retryWrites=true&w=majority",
+    "SESSION_SECRET": "shopapp_secret_key_2024"
+  }
+} 

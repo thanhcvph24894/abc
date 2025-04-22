@@ -1,0 +1,106 @@
+<%- include('../../partials/header') %>
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Quản lý người dùng</h1>
+    
+    <% if (messages.success) { %>
+        <div class="alert alert-success">
+            <%= messages.success %>
+        </div>
+    <% } %>
+    
+    <% if (messages.error) { %>
+        <div class="alert alert-danger">
+            <%= messages.error %>
+        </div>
+    <% } %>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-users me-1"></i>
+                Danh sách người dùng
+            </div>
+            <a href="/users/create" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus me-1"></i>Thêm mới
+            </a>
+        </div>
+        <div class="card-body">
+            <table id="usersTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Avatar</th>
+                        <th>Tên</th>
+                        <th>Email</th>
+                        <th>Số điện thoại</th>
+                        <th>Vai trò</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user => { %>
+                        <tr>
+                            <td>
+                                <img src="<%= user.avatar || '/images/default-avatar.png' %>" 
+                                     alt="Avatar" 
+                                     class="rounded-circle"
+                                     width="50"
+                                     height="50">
+                            </td>
+                            <td><%= user.name %></td>
+                            <td><%= user.email %></td>
+                            <td><%= user.phone %></td>
+                            <td>
+                                <span class="badge <%= user.role === 'admin' ? 'bg-danger' : 'bg-primary' %>">
+                                    <%= user.role === 'admin' ? 'Admin' : 'User' %>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input status-toggle" 
+                                           type="checkbox" 
+                                           data-id="<%= user._id %>"
+                                           <%= user.status === 'active' ? 'checked' : '' %>>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="/users/edit/<%= user._id %>" 
+                                   class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-danger btn-sm delete-user" 
+                                        data-id="<%= user._id %>">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn xóa người dùng này?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/user.js"></script>
+
+<%- include('../../partials/footer') %> 

@@ -1,0 +1,389 @@
+/* Sidebar */
+.wrapper {
+    display: flex;
+    width: 100%;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+#sidebar.active {
+    margin-left: -250px;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: #343a40;
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+}
+
+#sidebar ul li a {
+    padding: 10px 20px;
+    font-size: 1.1em;
+    display: block;
+    color: #fff;
+    text-decoration: none;
+}
+
+#sidebar ul li a:hover {
+    background: #495057;
+}
+
+#sidebar ul li.active>a {
+    background: #0d6efd;
+}
+
+/* Content */
+#content {
+    width: 100%;
+    padding: 0;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+/* Navbar */
+.navbar {
+    padding: 15px 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#sidebarCollapse {
+    margin-right: 15px;
+}
+
+/* Tables */
+.table th {
+    background-color: #f8f9fa;
+    white-space: nowrap;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table-striped>tbody>tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table-striped>tbody>tr:nth-of-type(even) {
+    background-color: #ffffff;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Form Controls in Tables */
+.table .form-select {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+
+.table .form-select:hover:not(:disabled) {
+    border-color: #adb5bd;
+}
+
+.table .form-select:disabled {
+    background-color: #e9ecef;
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+/* Status Colors */
+.table .form-select option {
+    background-color: #fff;
+    color: #212529;
+}
+
+/* Order Status Colors */
+.table .order-status option[value="Chờ xác nhận"] {
+    color: #ffc107;
+}
+
+.table .order-status option[value="Đã xác nhận"] {
+    color: #17a2b8;
+}
+
+.table .order-status option[value="Đang giao hàng"] {
+    color: #007bff;
+}
+
+.table .order-status option[value="Đã giao hàng"] {
+    color: #28a745;
+}
+
+.table .order-status option[value="Đã hủy"] {
+    color: #dc3545;
+}
+
+/* Payment Status Colors */
+.table .payment-status option[value="Chưa thanh toán"] {
+    color: #ffc107;
+}
+
+.table .payment-status option[value="Đã thanh toán"] {
+    color: #28a745;
+}
+
+.table .payment-status option[value="Hoàn tiền"] {
+    color: #17a2b8;
+}
+
+/* DataTables Overrides */
+.dataTables_wrapper .table.dataTable {
+    margin-top: 16px !important;
+    margin-bottom: 16px !important;
+    border-collapse: collapse !important;
+}
+
+.table.dataTable tbody tr.odd {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table.dataTable tbody tr.even {
+    background-color: #ffffff;
+}
+
+/* Remove DataTables Shadow */
+table.dataTable.table-striped>tbody>tr:nth-of-type(2n+1)>* {
+    box-shadow: none !important;
+}
+
+.table> :not(caption)>*>* {
+    box-shadow: none !important;
+}
+
+.dataTables_wrapper {
+    padding: 1rem;
+    background: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.dataTables_length select {
+    min-width: 80px;
+}
+
+.dataTables_filter input {
+    min-width: 200px;
+}
+
+.dataTables_info {
+    padding-top: 1rem !important;
+}
+
+.dataTables_paginate {
+    padding-top: 1rem !important;
+}
+
+.page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-group {
+    gap: 0.25rem;
+}
+
+.toggle-status {
+    width: 40px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* Responsive tables */
+@media screen and (max-width: 767px) {
+
+    div.dataTables_wrapper div.dataTables_length,
+    div.dataTables_wrapper div.dataTables_filter,
+    div.dataTables_wrapper div.dataTables_info,
+    div.dataTables_wrapper div.dataTables_paginate {
+        text-align: left;
+        margin-bottom: 0.5rem;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0.3rem 0.6rem;
+    }
+}
+
+/* Cards */
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+/* Forms */
+.form-label {
+    font-weight: 500;
+}
+
+.required:after {
+    content: " *";
+    color: red;
+}
+
+/* Buttons */
+.btn-action {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Dashboard Stats */
+.stats-card {
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.stats-card i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.stats-card .stats-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Order Management Styles */
+.disabled-select {
+    background-color: #e9ecef !important;
+    opacity: 0.65;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-cho-xac-nhan {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.status-da-xac-nhan {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+.status-dang-giao-hang {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.status-da-giao-hang {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.status-da-huy {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.payment-badge {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.payment-chua-thanh-toan {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.payment-da-thanh-toan {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.payment-hoan-tien {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+
+    #sidebar.active {
+        margin-left: 0;
+    }
+
+    #content {
+        width: 100%;
+    }
+}
+
+/* Color and Size Badges */
+.product-attribute {
+    display: inline-block;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.product-colors, .product-sizes {
+    margin-bottom: 8px;
+}
+
+.product-colors .badge, .product-sizes .badge {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+    margin-right: 3px;
+    margin-bottom: 3px;
+    display: inline-block;
+}
+
+/* Multiselect tag styling */
+.bootstrap-tagsinput {
+    width: 100%;
+    min-height: 38px;
+    padding: 8px 12px;
+    color: #212529;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.bootstrap-tagsinput .tag {
+    background-color: #0d6efd;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 3px;
+    margin-bottom: 3px;
+    display: inline-block;
+}
+
+.bootstrap-tagsinput input {
+    border: none;
+    box-shadow: none;
+    outline: none;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    width: auto !important;
+    max-width: inherit;
+}
+
+.bootstrap-tagsinput input:focus {
+    border: none;
+    box-shadow: none;
+}

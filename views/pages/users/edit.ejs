@@ -1,0 +1,146 @@
+<%- include('../../partials/header') %>
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Chỉnh sửa người dùng</h1>
+    
+    <% if (messages.error) { %>
+        <div class="alert alert-danger">
+            <%= messages.error %>
+        </div>
+    <% } %>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-user-edit me-1"></i>
+            Thông tin người dùng
+        </div>
+        <div class="card-body">
+            <form action="/users/edit/<%= user._id %>" method="POST" enctype="multipart/form-data">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">Tên người dùng <span class="text-danger">*</span></label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="name" 
+                               name="name" 
+                               value="<%= user.name %>"
+                               required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="email" 
+                               name="email" 
+                               value="<%= user.email %>"
+                               required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">Mật khẩu mới</label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               name="password">
+                        <div class="form-text">Để trống nếu không muốn thay đổi mật khẩu</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="confirmPassword" 
+                               name="confirmPassword">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Số điện thoại</label>
+                        <input type="tel" 
+                               class="form-control" 
+                               id="phone" 
+                               name="phone"
+                               value="<%= user.phone || '' %>">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="role" class="form-label">Vai trò <span class="text-danger">*</span></label>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="user" <%= user.role === 'user' ? 'selected' : '' %>>User</option>
+                            <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="address" class="form-label">Địa chỉ</label>
+                        <textarea class="form-control" 
+                                  id="address" 
+                                  name="address" 
+                                  rows="3"><%= user.address || '' %></textarea>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="avatar" class="form-label">Avatar</label>
+                        <input type="file" 
+                               class="form-control" 
+                               id="avatar" 
+                               name="avatar"
+                               accept="image/jpeg,image/png,image/jpg">
+                        <div class="form-text">Chấp nhận file: JPG, JPEG, PNG. Tối đa 2MB</div>
+                    </div>
+                    <div class="col-md-6">
+                        <img id="avatarPreview" 
+                             src="<%= user.avatar || '/images/default-avatar.png' %>" 
+                             alt="Avatar Preview" 
+                             class="mt-2" 
+                             style="max-width: 100px;">
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Lưu thay đổi
+                    </button>
+                    <a href="/users" class="btn btn-secondary">
+                        <i class="fas fa-times me-1"></i>Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Avatar preview
+    $('#avatar').change(function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#avatarPreview').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Form validation
+    $('form').submit(function(e) {
+        const password = $('#password').val();
+        const confirmPassword = $('#confirmPassword').val();
+
+        if (password && password !== confirmPassword) {
+            e.preventDefault();
+            alert('Mật khẩu xác nhận không khớp');
+            return false;
+        }
+    });
+});
+</script>
+
+<%- include('../../partials/footer') %> 

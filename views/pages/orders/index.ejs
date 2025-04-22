@@ -1,0 +1,212 @@
+<%- include('../../partials/header') %>
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Quản lý đơn hàng</h1>
+    
+    <% if (messages.success) { %>
+        <div class="alert alert-success">
+            <%= messages.success %>
+        </div>
+    <% } %>
+    
+    <% if (messages.error) { %>
+        <div class="alert alert-danger">
+            <%= messages.error %>
+        </div>
+    <% } %>
+
+    <!-- Form tìm kiếm đơn giản -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-search me-1"></i>
+            Tìm kiếm đơn hàng
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" 
+                           name="search" 
+                           class="form-control" 
+                           placeholder="Tìm theo mã đơn, tên hoặc SĐT"
+                           value="<%= searchQuery %>">
+                </div>
+                <div class="col-md-3">
+                    <select name="orderStatus" class="form-select">
+                        <option value="">-- Trạng thái đơn hàng --</option>
+                        <% orderStatuses.forEach(status => { %>
+                            <option value="<%= status %>" <%= selectedStatus === status ? 'selected' : '' %>>
+                                <%= status %>
+                            </option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i>Tìm kiếm
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a href="/orders" class="btn btn-secondary w-100">
+                        <i class="fas fa-redo me-1"></i>Đặt lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-shopping-cart me-1"></i>
+            Danh sách đơn hàng
+        </div>
+        <div class="card-body">
+            <table id="ordersTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Tổng tiền</th>
+                        <th>Phương thức</th>
+                        <th>Trạng thái TT</th>
+                        <th>Trạng thái ĐH</th>
+                        <th>Ngày tạo</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% orders.forEach(order => { %>
+                        <tr>
+                            <td><%= order._id %></td>
+                            <td>
+                                <div><%= order.user.name %></div>
+                                <small class="text-muted"><%= order.user.email %></small>
+                            </td>
+                            <td>
+                                <%= new Intl.NumberFormat('vi-VN', { 
+                                    style: 'currency', 
+                                    currency: 'VND' 
+                                }).format(order.totalAmount) %>
+                            </td>
+                            <td>
+                                <% const paymentMethodLabels = {
+                                    'COD': 'Thanh toán khi nhận hàng',
+                                    'VNPAY': 'Thanh toán VNPAY',
+                                    'MOMO': 'Thanh toán MOMO'
+                                } %>
+                                <%= paymentMethodLabels[order.paymentMethod] %>
+                            </td>
+                            <td>
+                                <select class="form-select form-select-sm payment-status <%= (order.orderStatus === 'Đã hủy' || order.paymentStatus === 'Hoàn tiền') ? 'disabled-select' : '' %>"
+                                        data-id="<%= order._id %>"
+                                        <%= (order.orderStatus === 'Đã hủy' || order.paymentStatus === 'Hoàn tiền') ? 'disabled' : '' %>>
+                                    <option value="Chưa thanh toán" 
+                                            <%= order.paymentStatus === 'Chưa thanh toán' ? 'selected' : '' %>
+                                            <%= ['Đã thanh toán', 'Hoàn tiền'].includes(order.paymentStatus) ? 'disabled' : '' %>>
+                                        Chưa thanh toán
+                                    </option>
+                                    <option value="Đã thanh toán"
+                                            <%= order.paymentStatus === 'Đã thanh toán' ? 'selected' : '' %>
+                                            <%= order.paymentStatus === 'Hoàn tiền' ? 'disabled' : '' %>>
+                                        Đã thanh toán
+                                    </option>
+                                    <option value="Hoàn tiền"
+                                            <%= order.paymentStatus === 'Hoàn tiền' ? 'selected' : '' %>>
+                                        Hoàn tiền
+                                    </option>
+                                </select>
+                                <span class="badge payment-<%= order.paymentStatus.toLowerCase().replace(/\s+/g, '-') %>">
+                                    <%= order.paymentStatus %>
+                                </span>
+                            </td>
+                            <td>
+                                <select class="form-select form-select-sm order-status <%= (order.orderStatus === 'Đã hủy' || order.orderStatus === 'Đã giao hàng') ? 'disabled-select' : '' %>" 
+                                        data-id="<%= order._id %>"
+                                        <%= (order.orderStatus === 'Đã hủy' || order.orderStatus === 'Đã giao hàng') ? 'disabled' : '' %>>
+                                    <option value="Chờ xác nhận" 
+                                            <%= order.orderStatus === 'Chờ xác nhận' ? 'selected' : '' %>
+                                            <%= ['Đã xác nhận', 'Đang giao hàng', 'Đã giao hàng'].includes(order.orderStatus) ? 'disabled' : '' %>>
+                                        Chờ xác nhận
+                                    </option>
+                                    <option value="Đã xác nhận"
+                                            <%= order.orderStatus === 'Đã xác nhận' ? 'selected' : '' %>
+                                            <%= ['Đang giao hàng', 'Đã giao hàng'].includes(order.orderStatus) ? 'disabled' : '' %>>
+                                        Đã xác nhận
+                                    </option>
+                                    <option value="Đang giao hàng"
+                                            <%= order.orderStatus === 'Đang giao hàng' ? 'selected' : '' %>
+                                            <%= order.orderStatus === 'Đã giao hàng' ? 'disabled' : '' %>>
+                                        Đang giao hàng
+                                    </option>
+                                    <option value="Đã giao hàng"
+                                            <%= order.orderStatus === 'Đã giao hàng' ? 'selected' : '' %>>
+                                        Đã giao hàng
+                                    </option>
+                                    <option value="Đã hủy"
+                                            <%= order.orderStatus === 'Đã hủy' ? 'selected' : '' %>
+                                            <%= ['Đã giao hàng'].includes(order.orderStatus) ? 'disabled' : '' %>>
+                                        Đã hủy
+                                    </option>
+                                </select>
+                                <span class="badge status-<%= order.orderStatus.toLowerCase().replace(/\s+/g, '-') %>">
+                                    <%= order.orderStatus %>
+                                </span>
+                            </td>
+                            <td>
+                                <%= new Date(order.createdAt).toLocaleDateString('vi-VN', {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) %>
+                            </td>
+                            <td>
+                                <a href="/orders/<%= order._id %>" 
+                                   class="btn btn-info btn-sm">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="/js/order.js"></script>
+
+<style>
+.disabled-select {
+    background-color: #e9ecef !important;
+    opacity: 0.65;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+/* Trạng thái đơn hàng */
+.status-cho-xac-nhan { background-color: #ffc107; color: #000; }
+.status-da-xac-nhan { background-color: #17a2b8; color: #fff; }
+.status-dang-giao-hang { background-color: #007bff; color: #fff; }
+.status-da-giao-hang { background-color: #28a745; color: #fff; }
+.status-da-huy { background-color: #dc3545; color: #fff; }
+
+/* Trạng thái thanh toán */
+.payment-chua-thanh-toan { background-color: #ffc107; color: #000; }
+.payment-da-thanh-toan { background-color: #28a745; color: #fff; }
+.payment-hoan-tien { background-color: #17a2b8; color: #fff; }
+
+.badge {
+    font-size: 0.875rem;
+    padding: 0.4em 0.8em;
+    margin-top: 0.5rem;
+    display: block;
+    text-align: center;
+}
+
+.form-select {
+    margin-bottom: 0.5rem;
+}
+</style>
+
+<%- include('../../partials/footer') %>

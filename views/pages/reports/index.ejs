@@ -1,0 +1,238 @@
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mt-4">Báo cáo doanh thu <%= moment().month(month - 1).format('MM/YYYY') %></h1>
+        <div class="d-flex gap-2">
+            <form class="d-flex gap-2" method="GET">
+                <select name="month" class="form-select">
+                    <% for(let i = 1; i <= 12; i++) { %>
+                        <option value="<%= i %>" <%= month === i ? 'selected' : '' %>>
+                            Tháng <%= i %>
+                        </option>
+                    <% } %>
+                </select>
+                <select name="year" class="form-select">
+                    <% for(let i = 2023; i <= new Date().getFullYear(); i++) { %>
+                        <option value="<%= i %>" <%= year === i ? 'selected' : '' %>>
+                            Năm <%= i %>
+                        </option>
+                    <% } %>
+                </select>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter me-2"></i>Lọc
+                </button>
+            </form>
+            <button class="btn btn-outline-secondary" onclick="window.print()">
+                <i class="fas fa-print me-2"></i>In báo cáo
+            </button>
+        </div>
+    </div>
+
+    <!-- Thống kê tổng quan -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Doanh thu tháng</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(monthlyDetails.totalRevenue) %>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Số đơn hàng</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <%= monthlyDetails.orderCount %>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Giá trị trung bình</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(monthlyDetails.avgOrderValue) %>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Biểu đồ doanh thu -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Biểu đồ doanh thu năm <%= year %></h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thống kê thanh toán -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Phương thức thanh toán</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="paymentChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Biểu đồ doanh thu
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+const chartData = JSON.parse('<%- JSON.stringify(chartData) %>');
+new Chart(revenueCtx, {
+    type: 'bar',
+    data: {
+        labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+        datasets: [{
+            label: 'Doanh thu (VNĐ)',
+            data: chartData,
+            backgroundColor: 'rgba(78, 115, 223, 0.5)',
+            borderColor: 'rgba(78, 115, 223, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND',
+                            maximumFractionDigits: 0
+                        }).format(value);
+                    }
+                }
+            }
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND'
+                        }).format(context.raw);
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Biểu đồ phương thức thanh toán
+const paymentCtx = document.getElementById('paymentChart').getContext('2d');
+const paymentData = JSON.parse('<%- JSON.stringify(paymentMethodStats) %>');
+new Chart(paymentCtx, {
+    type: 'doughnut',
+    data: {
+        labels: paymentData.map(item => {
+            const labels = {
+                'COD': 'Tiền mặt',
+                'VNPAY': 'VNPay',
+                'MOMO': 'Momo'
+            };
+            return labels[item._id] || item._id;
+        }),
+        datasets: [{
+            data: paymentData.map(item => item.total),
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 206, 86, 0.8)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const value = context.raw;
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = ((value / total) * 100).toFixed(1);
+                        return `${new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND'
+                        }).format(value)} (${percentage}%)`;
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+
+<style>
+@media print {
+    .btn, form {
+        display: none !important;
+    }
+    .card {
+        break-inside: avoid;
+    }
+}
+
+.border-left-primary {
+    border-left: .25rem solid #4e73df!important;
+}
+.border-left-success {
+    border-left: .25rem solid #1cc88a!important;
+}
+.border-left-info {
+    border-left: .25rem solid #36b9cc!important;
+}
+.text-gray-300 {
+    color: #dddfeb!important;
+}
+.text-gray-800 {
+    color: #5a5c69!important;
+}
+</style>
+
+<%- include('../../partials/footer') %> 

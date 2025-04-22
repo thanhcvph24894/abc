@@ -1,0 +1,214 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Tổng quan</h1>
+    <div>
+        <button class="btn btn-outline-secondary" onclick="window.print()">
+            <i class="fas fa-print me-2"></i>In báo cáo
+        </button>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <!-- Thống kê tổng quan -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Doanh thu tháng</div>
+                            <div class="h5 mb-0 font-weight-bold">
+                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(stats.totalRevenue) %>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Đơn hàng</div>
+                            <div class="h5 mb-0 font-weight-bold">
+                                <%= stats.orderCount %>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Danh mục</div>
+                            <div class="h5 mb-0 font-weight-bold">
+                                <%= stats.categoryCount %>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Người dùng</div>
+                            <div class="h5 mb-0 font-weight-bold">
+                                <%= stats.userCount %>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Đơn hàng mới nhất -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Đơn hàng mới nhất</h6>
+                    <a href="/orders" class="btn btn-sm btn-primary">
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Mã đơn</th>
+                                    <th>Khách hàng</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (recentOrders.length > 0) { %>
+                                    <% recentOrders.forEach(order => { %>
+                                        <tr>
+                                            <td><%= order._id %></td>
+                                            <td><%= order.user ? order.user.name : 'N/A' %></td>
+                                            <td><%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalAmount) %></td>
+                                            <td>
+                                                <span class="badge status-<%= order.orderStatus.toLowerCase().replace(/\s+/g, '-') %>">
+                                                    <%= order.orderStatus %>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="4" class="text-center">Chưa có đơn hàng nào</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top sản phẩm bán chạy -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-success">Top sản phẩm bán chạy</h6>
+                    <a href="/reports" class="btn btn-sm btn-success">
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Số lượng</th>
+                                    <th>Doanh thu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (topProducts && topProducts.length > 0) { %>
+                                    <% topProducts.forEach(product => { %>
+                                        <tr>
+                                            <td><%= product.name %></td>
+                                            <td class="text-center"><%= product.totalQuantity %></td>
+                                            <td class="text-end">
+                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.totalRevenue) %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="3" class="text-center">Chưa có dữ liệu</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.border-left-primary { border-left: .25rem solid #4e73df!important; }
+.border-left-success { border-left: .25rem solid #1cc88a!important; }
+.border-left-info { border-left: .25rem solid #36b9cc!important; }
+.border-left-warning { border-left: .25rem solid #f6c23e!important; }
+.text-gray-300 { color: #dddfeb!important; }
+
+.status-cho-xac-nhan { background-color: #ffc107; color: #000; }
+.status-da-xac-nhan { background-color: #17a2b8; color: #fff; }
+.status-dang-giao-hang { background-color: #007bff; color: #fff; }
+.status-da-giao-hang { background-color: #28a745; color: #fff; }
+.status-da-huy { background-color: #dc3545; color: #fff; }
+
+.badge {
+    padding: 0.5em 0.75em;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    font-size: 85%;
+}
+
+.card {
+    margin-bottom: 1.5rem;
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+@media print {
+    .btn {
+        display: none !important;
+    }
+}
+</style> 

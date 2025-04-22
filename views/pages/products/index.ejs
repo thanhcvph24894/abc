@@ -1,0 +1,264 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Quản lý sản phẩm</h1>
+        <a href="/products/create" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Thêm sản phẩm
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover datatable">
+                    <thead>
+                        <tr>
+                            <th width="5%">STT</th>
+                            <th width="15%">Tên sản phẩm</th>
+                            <th width="10%">Danh mục</th>
+                            <th width="10%">Giá</th>
+                            <th width="8%">Tồn kho</th>
+                            <th width="12%">Thuộc tính</th>
+                            <th width="12%">Hình ảnh</th>
+                            <th width="15%">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% products.forEach((product, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="fw-medium"><%= product.name %></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        <%= product.category ? product.category.name : 'Không có' %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) %>
+                                </td>
+                                <td>
+                                    <span class="badge <%= product.stock > 0 ? 'bg-success' : 'bg-danger' %>">
+                                        <%= product.stock %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="small">
+                                        <% if(product.colors && product.colors.length > 0) { %>
+                                            <div><strong>Màu:</strong> 
+                                                <% product.colors.slice(0, 3).forEach((color, i) => { %>
+                                                    <span class="badge bg-secondary"><%= color %></span>
+                                                <% }) %>
+                                                <% if(product.colors.length > 3) { %>
+                                                    <span class="badge bg-secondary">+<%= product.colors.length - 3 %></span>
+                                                <% } %>
+                                            </div>
+                                        <% } %>
+                                        
+                                        <% if(product.sizes && product.sizes.length > 0) { %>
+                                            <div class="mt-1"><strong>Size:</strong> 
+                                                <% product.sizes.slice(0, 3).forEach((size, i) => { %>
+                                                    <span class="badge bg-secondary"><%= size %></span>
+                                                <% }) %>
+                                                <% if(product.sizes.length > 3) { %>
+                                                    <span class="badge bg-secondary">+<%= product.sizes.length - 3 %></span>
+                                                <% } %>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <% if(product.images && product.images.length > 0) { %>
+                                        <img src="<%= product.images[0] %>" alt="<%= product.name %>"
+                                            class="img-thumbnail" style="max-width: 50px;">
+                                    <% } else { %>
+                                        <span class="text-muted">Không có ảnh</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <a href="/products/edit/<%= product._id %>" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input toggle-status" 
+                                                   type="checkbox"
+                                                   <%= product.isActive ? 'checked' : '' %>
+                                                   data-url="/products/<%= product._id %>/status"
+                                                   data-id="status-badge-<%= product._id %>"
+                                                   data-type="sản phẩm">
+                                            <span class="badge <%= product.isActive ? 'bg-success' : 'bg-danger' %> status-badge" 
+                                                  id="status-badge-<%= product._id %>">
+                                                <%= product.isActive ? 'Đang bán' : 'Đã ẩn' %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                        <% if (products.length === 0) { %>
+                            <tr>
+                                <td colspan="8" class="text-center">Không có sản phẩm nào</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('style') %>
+    <style>
+        .form-switch {
+            padding-left: 2.5em;
+        }
+        .status-badge {
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .status-badge[data-active="true"] {
+            background-color: #198754;
+        }
+
+        .status-badge[data-active="false"] {
+            background-color: #dc3545;
+        }
+    </style>
+
+    <%- contentFor('script') %>
+        <script>
+            $(document).ready(function () {
+                // Khởi tạo Toast cho thông báo
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+
+                // Khởi tạo DataTable
+                const table = $('.datatable').DataTable({
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json'
+                    },
+                    pageLength: 10,
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Tất cả"]],
+                    order: [[0, 'asc']],
+                    responsive: true
+                });
+
+                // Hiển thị thông báo thành công nếu có
+                const successMessage = '<%= messages.success %>';
+                if (successMessage) {
+                    Toast.fire({
+                        icon: 'success',
+                        title: successMessage
+                    });
+                }
+
+                // Xử lý cập nhật trạng thái
+                $(document).on('change', '.toggle-status', function() {
+                    const checkbox = $(this);
+                    const url = checkbox.data('url');
+                    const newState = checkbox.prop('checked');
+                    const badge = checkbox.closest('td').find('.status-badge');
+
+                    Swal.fire({
+                        title: 'Xác nhận thay đổi?',
+                        text: `Bạn có chắc chắn muốn ${newState ? 'kích hoạt' : 'ngừng bán'} sản phẩm này?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#198754',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Xác nhận',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: url,
+                                type: 'PUT',
+                                data: { isActive: newState },
+                                success: function(response) {
+                                    if (response.success) {
+                                        // Cập nhật UI dựa trên response từ server
+                                        checkbox.prop('checked', response.isActive);
+                                        badge
+                                            .removeClass('bg-success bg-danger')
+                                            .addClass(response.isActive ? 'bg-success' : 'bg-danger')
+                                            .text(response.isActive ? 'Hoạt động' : 'Ngừng bán');
+
+                                        Toast.fire({
+                                            icon: 'success',
+                                            title: response.message
+                                        });
+                                    } else {
+                                        // Reset về trạng thái ban đầu nếu có lỗi
+                                        checkbox.prop('checked', !newState);
+                                        badge
+                                            .removeClass('bg-success bg-danger')
+                                            .addClass(!newState ? 'bg-success' : 'bg-danger')
+                                            .text(!newState ? 'Hoạt động' : 'Ngừng bán');
+                                        
+                                        Toast.fire({
+                                            icon: 'error',
+                                            title: response.message
+                                        });
+                                    }
+                                },
+                                error: function(xhr) {
+                                    // Reset về trạng thái ban đầu nếu có lỗi
+                                    checkbox.prop('checked', !newState);
+                                    badge
+                                        .removeClass('bg-success bg-danger')
+                                        .addClass(!newState ? 'bg-success' : 'bg-danger')
+                                        .text(!newState ? 'Hoạt động' : 'Ngừng bán');
+
+                                    const message = xhr.responseJSON?.message || 'Đã có lỗi xảy ra';
+                                    Toast.fire({
+                                        icon: 'error',
+                                        title: message
+                                    });
+                                }
+                            });
+                        } else {
+                            // Reset về trạng thái ban đầu nếu người dùng hủy
+                            checkbox.prop('checked', !newState);
+                            badge
+                                .removeClass('bg-success bg-danger')
+                                .addClass(!newState ? 'bg-success' : 'bg-danger')
+                                .text(!newState ? 'Hoạt động' : 'Ngừng bán');
+                        }
+                    });
+                });
+            });
+        </script>
+
+        <!-- Modal xác nhận xóa -->
+        <div class="modal fade" id="deleteModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Xác nhận xóa</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn xóa sản phẩm này?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <form id="deleteForm" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-danger">Xóa</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
