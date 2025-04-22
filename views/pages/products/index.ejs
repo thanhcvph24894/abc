@@ -9,7 +9,7 @@
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover datatable">
+                <table id="usersTable" class="table table-striped" class="table table-hover datatable">
                     <thead>
                         <tr>
                             <th width="5%">STT</th>
@@ -23,12 +23,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% products.forEach((product, index) => { %>
+                        <% products.forEach((product, index)=> { %>
                             <tr>
-                                <td><%= index + 1 %></td>
+                                <td>
+                                    <%= index + 1 %>
+                                </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <span class="fw-medium"><%= product.name %></span>
+                                        <span class="fw-medium">
+                                            <%= product.name %>
+                                        </span>
                                     </div>
                                 </td>
                                 <td>
@@ -37,7 +41,8 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) %>
+                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                        }).format(product.price) %>
                                 </td>
                                 <td>
                                     <span class="badge <%= product.stock > 0 ? 'bg-success' : 'bg-danger' %>">
@@ -46,36 +51,42 @@
                                 </td>
                                 <td>
                                     <div class="small">
-                                        <% if(product.colors && product.colors.length > 0) { %>
-                                            <div><strong>Màu:</strong> 
-                                                <% product.colors.slice(0, 3).forEach((color, i) => { %>
-                                                    <span class="badge bg-secondary"><%= color %></span>
-                                                <% }) %>
-                                                <% if(product.colors.length > 3) { %>
-                                                    <span class="badge bg-secondary">+<%= product.colors.length - 3 %></span>
-                                                <% } %>
+                                        <% if(product.colors && product.colors.length> 0) { %>
+                                            <div><strong>Màu:</strong>
+                                                <% product.colors.slice(0, 3).forEach((color, i)=> { %>
+                                                    <span class="badge bg-secondary">
+                                                        <%= color %>
+                                                    </span>
+                                                    <% }) %>
+                                                        <% if(product.colors.length> 3) { %>
+                                                            <span class="badge bg-secondary">+<%= product.colors.length
+                                                                    - 3 %></span>
+                                                            <% } %>
                                             </div>
-                                        <% } %>
-                                        
-                                        <% if(product.sizes && product.sizes.length > 0) { %>
-                                            <div class="mt-1"><strong>Size:</strong> 
-                                                <% product.sizes.slice(0, 3).forEach((size, i) => { %>
-                                                    <span class="badge bg-secondary"><%= size %></span>
-                                                <% }) %>
-                                                <% if(product.sizes.length > 3) { %>
-                                                    <span class="badge bg-secondary">+<%= product.sizes.length - 3 %></span>
-                                                <% } %>
-                                            </div>
-                                        <% } %>
+                                            <% } %>
+
+                                                <% if(product.sizes && product.sizes.length> 0) { %>
+                                                    <div class="mt-1"><strong>Size:</strong>
+                                                        <% product.sizes.slice(0, 3).forEach((size, i)=> { %>
+                                                            <span class="badge bg-secondary">
+                                                                <%= size %>
+                                                            </span>
+                                                            <% }) %>
+                                                                <% if(product.sizes.length> 3) { %>
+                                                                    <span class="badge bg-secondary">+<%=
+                                                                            product.sizes.length - 3 %></span>
+                                                                    <% } %>
+                                                    </div>
+                                                    <% } %>
                                     </div>
                                 </td>
                                 <td>
-                                    <% if(product.images && product.images.length > 0) { %>
+                                    <% if(product.images && product.images.length> 0) { %>
                                         <img src="<%= product.images[0] %>" alt="<%= product.name %>"
                                             class="img-thumbnail" style="max-width: 50px;">
-                                    <% } else { %>
-                                        <span class="text-muted">Không có ảnh</span>
-                                    <% } %>
+                                        <% } else { %>
+                                            <span class="text-muted">Không có ảnh</span>
+                                            <% } %>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
@@ -83,26 +94,26 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input toggle-status" 
-                                                   type="checkbox"
-                                                   <%= product.isActive ? 'checked' : '' %>
-                                                   data-url="/products/<%= product._id %>/status"
-                                                   data-id="status-badge-<%= product._id %>"
-                                                   data-type="sản phẩm">
-                                            <span class="badge <%= product.isActive ? 'bg-success' : 'bg-danger' %> status-badge" 
-                                                  id="status-badge-<%= product._id %>">
-                                                <%= product.isActive ? 'Đang bán' : 'Đã ẩn' %>
-                                            </span>
+                                            <input class="form-check-input toggle-status" type="checkbox"
+                                                <%=product.isActive ? 'checked' : '' %>
+                                            data-url="/products/<%= product._id %>/status"
+                                                data-id="status-badge-<%= product._id %>"
+                                                    data-type="sản phẩm">
+                                                    <span
+                                                        class="badge <%= product.isActive ? 'bg-success' : 'bg-danger' %> status-badge"
+                                                        id="status-badge-<%= product._id %>">
+                                                        <%= product.isActive ? 'Đang bán' : 'Đã ẩn' %>
+                                                    </span>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
-                        <% }) %>
-                        <% if (products.length === 0) { %>
-                            <tr>
-                                <td colspan="8" class="text-center">Không có sản phẩm nào</td>
-                            </tr>
-                        <% } %>
+                            <% }) %>
+                                <% if (products.length===0) { %>
+                                    <tr>
+                                        <td colspan="8" class="text-center">Không có sản phẩm nào</td>
+                                    </tr>
+                                    <% } %>
                     </tbody>
                 </table>
             </div>
@@ -115,6 +126,7 @@
         .form-switch {
             padding-left: 2.5em;
         }
+
         .status-badge {
             min-width: 80px;
             text-align: center;
@@ -166,7 +178,7 @@
                 }
 
                 // Xử lý cập nhật trạng thái
-                $(document).on('change', '.toggle-status', function() {
+                $(document).on('change', '.toggle-status', function () {
                     const checkbox = $(this);
                     const url = checkbox.data('url');
                     const newState = checkbox.prop('checked');
@@ -187,7 +199,7 @@
                                 url: url,
                                 type: 'PUT',
                                 data: { isActive: newState },
-                                success: function(response) {
+                                success: function (response) {
                                     if (response.success) {
                                         // Cập nhật UI dựa trên response từ server
                                         checkbox.prop('checked', response.isActive);
@@ -207,14 +219,14 @@
                                             .removeClass('bg-success bg-danger')
                                             .addClass(!newState ? 'bg-success' : 'bg-danger')
                                             .text(!newState ? 'Hoạt động' : 'Ngừng bán');
-                                        
+
                                         Toast.fire({
                                             icon: 'error',
                                             title: response.message
                                         });
                                     }
                                 },
-                                error: function(xhr) {
+                                error: function (xhr) {
                                     // Reset về trạng thái ban đầu nếu có lỗi
                                     checkbox.prop('checked', !newState);
                                     badge
