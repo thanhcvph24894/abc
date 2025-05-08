@@ -1,4 +1,4 @@
-<div class="container-fluid px-4">
+<div class="container-fluid ">
     <h1 class="mt-4">Quản lý đơn hàng</h1>
     
     <% if (messages.success) { %>
@@ -74,7 +74,7 @@
                 <tbody>
                     <% orders.forEach(order => { %>
                         <tr>
-                            <td><%= order._id %></td>
+                            <td><%= order.orderNumber %></td>
                             <td>
                                 <div><%= order.user.name %></div>
                                 <small class="text-muted"><%= order.user.email %></small>
@@ -139,7 +139,7 @@
                                             <%= order.orderStatus === 'Đã giao hàng' ? 'selected' : '' %>>
                                         Đã giao hàng
                                     </option>
-                                    <option value="Đã hủy"
+                                    <option disabled value="Đã hủy"
                                             <%= order.orderStatus === 'Đã hủy' ? 'selected' : '' %>
                                             <%= ['Đã giao hàng'].includes(order.orderStatus) ? 'disabled' : '' %>>
                                         Đã hủy

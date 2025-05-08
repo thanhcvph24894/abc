@@ -267,9 +267,11 @@ exports.createOrder = async (req, res) => {
         // Tạo array items cho đơn hàng
         const orderItems = cart.items.map(item => ({
             product: item.product._id,
+            name: item.product.name,
+            image: item.product.images[0],
             quantity: item.quantity,
             price: item.price,
-            variant: item.variant || {}
+            variant: item.variant || {} 
         }));
 
         // Tính toán tổng tiền

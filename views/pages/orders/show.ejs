@@ -60,7 +60,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <p class="mb-1"><strong>Mã đơn hàng:</strong></p>
-                            <p class="text-muted"><%= order._id %></p>
+                            <p class="text-muted"><%= order.orderNumber %></p>
                         </div>
                         <div class="col-md-6">
                             <p class="mb-1"><strong>Ngày đặt:</strong></p>
@@ -94,7 +94,7 @@
                                 <option value="Đã giao hàng" <%= order.orderStatus === 'Đã giao hàng' ? 'selected' : '' %>>
                                     Đã giao hàng
                                 </option>
-                                <option value="Đã hủy" <%= order.orderStatus === 'Đã hủy' ? 'selected' : '' %>>
+                                <option disabled value="Đã hủy" <%= order.orderStatus === 'Đã hủy' ? 'selected' : '' %>>
                                     Đã hủy
                                 </option>
                             </select>
@@ -138,12 +138,12 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="<%= item.product.images[0] %>" 
-                                                     alt="<%= item.product.name %>"
+                                                <img src="<%= item.image %>" 
+                                                     alt="<%= item.name %>"
                                                      class="me-2"
                                                      width="50">
                                                 <div>
-                                                    <%= item.product.name %>
+                                                    <%= item.name %>
                                                     <% if (item.variant) { %>
                                                         <br>
                                                         <small class="text-muted">

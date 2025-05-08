@@ -172,6 +172,14 @@ class OrderController {
                 });
             }
 
+            if (['Đã xác nhận', 'Đang giao hàng'].includes(order.orderStatus)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Không thể thay đổi trạng thái thanh toán cho đơn hàng đã xác nhận hoặc đang giao hàng'
+                });
+            }
+    
+
             // Kiểm tra trạng thái đơn hàng
             if (order.orderStatus === 'Đã hủy' && req.body.paymentStatus !== 'Hoàn tiền') {
                 return res.status(400).json({
