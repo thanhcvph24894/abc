@@ -1,42 +1,42 @@
 <div class="container-fluid px-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mt-4">Báo cáo doanh thu <%= moment().month(month - 1).format('MM/YYYY') %>
+    <h1 class="mt-4">
+            <%= reportTitle %>
         </h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        
         <div class="d-flex gap-2">
             <form class="d-flex gap-2" method="GET">
-                <select name="month" class="form-select">
-                    <% for(let i=1; i <=12; i++) { %>
-                        <option value="<%= i %>" <%=month===i ? 'selected' : '' %>>
-                            Tháng <%= i %>
-                        </option>
-                        <% } %>
-                </select>
-                <select name="year" class="form-select">
-                    <% for(let i=2023; i <=new Date().getFullYear(); i++) { %>
-                        <option value="<%= i %>" <%=year===i ? 'selected' : '' %>>
-                            Năm <%= i %>
-                        </option>
-                        <% } %>
-                </select>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-filter me-2"></i>Lọc
-                </button>
+                <div class="form-group">
+                    <label for="startDate" class="small mb-1">Từ ngày</label>
+                    <input type="date" id="startDate" name="startDate" class="form-control" value="<%= startDate %>" />
+                </div>
+                <div class="form-group">
+                    <label for="endDate" class="small mb-1">Đến ngày</label>
+                    <input type="date" id="endDate" name="endDate" class="form-control" value="<%= endDate %>" />
+                </div>
+                <div class="form-group d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter me-2"></i>Lọc
+                    </button>
+                </div>
             </form>
-            <button class="btn btn-outline-secondary" onclick="window.print()">
-                <i class="fas fa-print me-2"></i>In báo cáo
-            </button>
+            <div class="d-flex align-items-end">
+                <button class="btn btn-outline-secondary" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>In báo cáo
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Thống kê tổng quan -->
-    <div class="row">
-        <div class="col-xl-3 col-md-6 mb-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Doanh thu tháng</div>
+                                Doanh thu</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
                                     }).format(monthlyDetails.totalRevenue) %>
@@ -50,7 +50,7 @@
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="col-md-6">
             <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -87,11 +87,18 @@
         <!-- Thống kê thanh toán -->
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4">
-                <div class="card-header py-3">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Phương thức thanh toán</h6>
                 </div>
                 <div class="card-body">
-                    <canvas id="paymentChart"></canvas>
+                    <% if(paymentMethodStats && paymentMethodStats.length> 0) { %>
+                        <canvas id="paymentChart"></canvas>
+                        <% } else { %>
+                            <div class="text-center py-4">
+                                <i class="fas fa-chart-pie fa-3x text-gray-300 mb-3"></i>
+                                <p class="mb-0">Không có dữ liệu thanh toán trong khoảng thời gian này</p>
+                            </div>
+                            <% } %>
                 </div>
             </div>
         </div>
@@ -148,48 +155,50 @@
         }
     });
 
+    <% if (paymentMethodStats && paymentMethodStats.length > 0) { %>
     // Biểu đồ phương thức thanh toán
     const paymentCtx = document.getElementById('paymentChart').getContext('2d');
-    const paymentData = JSON.parse('<%- JSON.stringify(paymentMethodStats) %>');
-    new Chart(paymentCtx, {
-        type: 'doughnut',
-        data: {
-            labels: paymentData.map(item => {
-                const labels = {
-                    'COD': 'Tiền mặt',
-                    'VNPAY': 'VNPay',
-                    'MOMO': 'Momo'
-                };
-                return labels[item._id] || item._id;
-            }),
-            datasets: [{
-                data: paymentData.map(item => item.total),
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.8)',
-                    'rgba(54, 162, 235, 0.8)',
-                    'rgba(255, 206, 86, 0.8)'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            const value = context.raw;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((value / total) * 100).toFixed(1);
-                            return `${new Intl.NumberFormat('vi-VN', {
-                                style: 'currency',
-                                currency: 'VND'
-                            }).format(value)} (${percentage}%)`;
+        const paymentData = JSON.parse('<%- JSON.stringify(paymentMethodStats) %>');
+        new Chart(paymentCtx, {
+            type: 'doughnut',
+            data: {
+                labels: paymentData.map(item => {
+                    const labels = {
+                        'COD': 'Tiền mặt',
+                        'VNPAY': 'VNPay',
+                        'MOMO': 'Momo'
+                    };
+                    return labels[item._id] || item._id;
+                }),
+                datasets: [{
+                    data: paymentData.map(item => item.total),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const value = context.raw;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${new Intl.NumberFormat('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND'
+                                }).format(value)} (${percentage}%)`;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
+    <% } %>
 </script>
 
 <style>
@@ -217,6 +226,10 @@
         border-left: .25rem solid #36b9cc !important;
     }
 
+    .border-left-warning {
+        border-left: .25rem solid #f6c23e !important;
+    }
+
     .text-gray-300 {
         color: #dddfeb !important;
     }
@@ -224,236 +237,4 @@
     .text-gray-800 {
         color: #5a5c69 !important;
     }
-
-    :root {
-        --primary-color: #4361ee;
-        --secondary-color: #3f37c9;
-        --success-color: #4cc9f0;
-        --info-color: #4895ef;
-        --warning-color: #f72585;
-        --danger-color: #f72585;
-        --light-color: #f8f9fa;
-        --dark-color: #212529;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f5f7fa;
-        color: #444;
-    }
-
-    .dashboard-header {
-        padding: 1.5rem 0;
-        background-color: white;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        margin-bottom: 2rem;
-    }
-
-    .dashboard-title {
-        font-weight: 700;
-        color: var(--dark-color);
-        font-size: 1.8rem;
-        margin: 0;
-    }
-
-    .card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        transition: transform 0.3s, box-shadow 0.3s;
-        margin-bottom: 1.5rem;
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    .stats-card {
-        padding: 1.5rem;
-        height: 100%;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .stats-primary {
-        background: linear-gradient(to right, #4361ee, #3a0ca3);
-        color: white;
-    }
-
-    .stats-success {
-        background: linear-gradient(to right, #4cc9f0, #4895ef);
-        color: white;
-    }
-
-    .stats-info {
-        background: linear-gradient(to right, #4895ef, #3f37c9);
-        color: white;
-    }
-
-    .stats-heading {
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        position: relative;
-        z-index: 1;
-    }
-
-    .stats-value {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.3rem;
-        position: relative;
-        z-index: 1;
-    }
-
-    .stats-trend {
-        display: flex;
-        align-items: center;
-        font-size: 0.85rem;
-        margin-top: 0.5rem;
-        position: relative;
-        z-index: 1;
-    }
-
-    .stats-icon {
-        position: absolute;
-        right: 1.5rem;
-        bottom: 1.5rem;
-        font-size: 4rem;
-        opacity: 0.2;
-    }
-
-    .chart-container {
-        padding: 1.5rem;
-        background-color: white;
-        border-radius: 12px;
-    }
-
-    .chart-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: var(--dark-color);
-        margin-bottom: 1rem;
-    }
-
-    .filter-container {
-        background-color: white;
-        border-radius: 12px;
-        padding: 1rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    }
-
-    .btn-custom {
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 0.5rem 1.5rem;
-        font-weight: 500;
-        transition: all 0.3s;
-    }
-
-    .btn-custom:hover {
-        background-color: var(--secondary-color);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
-    }
-
-    .btn-outline-custom {
-        border: 1px solid #e0e0e0;
-        color: #555;
-        border-radius: 8px;
-        padding: 0.5rem 1.5rem;
-        font-weight: 500;
-        transition: all 0.3s;
-        background-color: white;
-    }
-
-    .btn-outline-custom:hover {
-        background-color: #f8f9fa;
-        border-color: #d0d0d0;
-        transform: translateY(-2px);
-    }
-
-    .form-select {
-        border-radius: 8px;
-        border: 1px solid #e0e0e0;
-        padding: 0.5rem 1rem;
-        font-size: 0.95rem;
-        color: #444;
-    }
-
-    .form-select:focus {
-        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
-        border-color: var(--primary-color);
-    }
-
-    .badge-trend {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-        border-radius: 12px;
-        font-weight: 500;
-    }
-
-    .badge-trend-up {
-        background-color: rgba(255, 255, 255, 0.2);
-        color: white;
-    }
-
-    .badge-trend-down {
-        background-color: rgba(255, 255, 255, 0.2);
-        color: white;
-    }
-
-    .section-title {
-        font-size: 1.4rem;
-        font-weight: 600;
-        color: var(--dark-color);
-        margin-bottom: 1.5rem;
-        position: relative;
-        padding-bottom: 0.5rem;
-    }
-
-    .section-title::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 50px;
-        height: 3px;
-        background-color: var(--primary-color);
-    }
-
-    @media print {
-
-        .btn,
-        .filter-container,
-        .no-print {
-            display: none !important;
-        }
-
-        body {
-            background-color: white;
-        }
-
-        .card {
-            break-inside: avoid;
-            box-shadow: none;
-            border: 1px solid #eee;
-        }
-
-        .dashboard-header {
-            box-shadow: none;
-            border-bottom: 1px solid #eee;
-        }
-
-        .chart-container {
-            break-inside: avoid;
-        }
-    }
 </style>
-
-<%- include('../../partials/footer') %>

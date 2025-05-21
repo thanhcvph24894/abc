@@ -10,16 +10,22 @@ class ReportController {
                 return res.redirect('/dashboard');
             }
 
-            const year = parseInt(req.query.year) || new Date().getFullYear();
-            const month = parseInt(req.query.month) || new Date().getMonth() + 1;
-            console.log(`Báo cáo cho năm: ${year}, tháng: ${month}`);
+            // Lấy năm hiện tại cho biểu đồ doanh thu theo năm
+            const year = new Date().getFullYear();
+            
+            // Xác định khoảng thời gian báo cáo từ ngày đến ngày
+            let startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+            let endDate = req.query.endDate ? new Date(req.query.endDate + 'T23:59:59') : null;
+            
+            // Mặc định là tháng hiện tại nếu không có ngày được chọn
+            if (!startDate || !endDate) {
+                startDate = moment().startOf('month').toDate();
+                endDate = moment().endOf('month').toDate();
+            }
 
-            // Tính ngày đầu tháng và cuối tháng
-            const startOfMonth = moment(`${year}-${month}-01`).startOf('month').toDate();
-            const endOfMonth = moment(`${year}-${month}-01`).endOf('month').toDate();
-            console.log(`Ngày đầu tháng: ${startOfMonth}, Ngày cuối tháng: ${endOfMonth}`);
-
-            // Tính ngày đầu năm và cuối năm
+            console.log(`Lọc theo ngày: ${startDate} đến ${endDate}`);
+            
+            // Tính ngày đầu năm và cuối năm cho biểu đồ năm
             const startOfYear = moment(`${year}-01-01`).startOf('year').toDate();
             const endOfYear = moment(`${year}-12-31`).endOf('year').toDate();
 
@@ -59,24 +65,24 @@ class ReportController {
             
             console.log(`Kết quả doanh thu theo tháng:`, JSON.stringify(monthlyRevenue));
 
-            // Kiểm tra số lượng đơn hàng trong tháng đã chọn
-            const completedOrdersInMonth = await Order.countDocuments({
+            // Kiểm tra số lượng đơn hàng trong khoảng thời gian đã chọn
+            const completedOrdersInPeriod = await Order.countDocuments({
                 orderStatus: 'Đã giao hàng',
                 paymentStatus: 'Đã thanh toán',
                 createdAt: {
-                    $gte: startOfMonth,
-                    $lte: endOfMonth
+                    $gte: startDate,
+                    $lte: endDate
                 }
             });
-            console.log(`Số đơn hàng đã hoàn thành trong tháng ${month}/${year}: ${completedOrdersInMonth}`);
+            console.log(`Số đơn hàng đã hoàn thành trong khoảng thời gian: ${completedOrdersInPeriod}`);
 
-            // Lấy dữ liệu chi tiết của tháng được chọn
-            const monthlyDetails = await Order.aggregate([
+            // Lấy dữ liệu chi tiết của khoảng thời gian được chọn
+            const periodDetails = await Order.aggregate([
                 {
                     $match: {
                         createdAt: {
-                            $gte: startOfMonth,
-                            $lte: endOfMonth
+                            $gte: startDate,
+                            $lte: endDate
                         }
                     }
                 },
@@ -122,7 +128,7 @@ class ReportController {
                     }
                 }
             ]).then(result => {
-                console.log(`Chi tiết doanh thu tháng ${month}:`, JSON.stringify(result));
+                console.log(`Chi tiết doanh thu khoảng thời gian:`, JSON.stringify(result));
                 return result[0] || {
                     totalRevenue: 0,
                     orderCount: 0,
@@ -139,8 +145,8 @@ class ReportController {
                         orderStatus: 'Đã giao hàng',
                         paymentStatus: 'Đã thanh toán',
                         createdAt: {
-                            $gte: startOfMonth,
-                            $lte: endOfMonth
+                            $gte: startDate,
+                            $lte: endDate
                         }
                     }
                 },
@@ -170,8 +176,8 @@ class ReportController {
                         orderStatus: 'Đã giao hàng',
                         paymentStatus: 'Đã thanh toán',
                         createdAt: {
-                            $gte: startOfMonth,
-                            $lte: endOfMonth
+                            $gte: startDate,
+                            $lte: endDate
                         }
                     }
                 },
@@ -211,8 +217,8 @@ class ReportController {
                         orderStatus: 'Đã giao hàng',
                         paymentStatus: 'Đã thanh toán',
                         createdAt: {
-                            $gte: startOfMonth,
-                            $lte: endOfMonth
+                            $gte: startDate,
+                            $lte: endDate
                         }
                     }
                 },
@@ -245,12 +251,19 @@ class ReportController {
                 { $limit: 10 }
             ]);
 
+            // Định dạng tiêu đề báo cáo
+            const formatStartDate = moment(startDate).format('DD/MM/YYYY');
+            const formatEndDate = moment(endDate).format('DD/MM/YYYY');
+            const reportTitle = `Báo cáo doanh thu ${formatStartDate} - ${formatEndDate}`;
+
             res.render('pages/reports/index', {
                 title: 'Báo cáo doanh thu',
+                reportTitle: reportTitle,
                 year,
-                month,
+                startDate: moment(startDate).format('YYYY-MM-DD'),
+                endDate: moment(endDate).format('YYYY-MM-DD'),
                 chartData,
-                monthlyDetails,
+                monthlyDetails: periodDetails, 
                 paymentMethodStats,
                 topSellingProducts,
                 worstSellingProducts,
@@ -265,4 +278,4 @@ class ReportController {
     }
 }
 
-module.exports = new ReportController(); 
+module.exports = new ReportController();
